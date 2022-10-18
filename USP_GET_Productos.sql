@@ -1,4 +1,4 @@
- CREATE PROCEDURE [dbo].[USP_GET_Productos]          
+CREATE PROCEDURE [dbo].[USP_GET_Productos]          
             
 	@nOpcion INT = 0,
     @nIdProducto INT=0
@@ -17,6 +17,7 @@ BEGIN
 				prd.bEstado,
 				IIF(prd.bEstado=1,'Activo', 'Inactivo') AS 'sEstado'
 			FROM [TBL_PRODUCTO] prd	
+			WHERE bEstado = 1
 			ORDER BY
 				prd.bEstado DESC ,
 				prd.sNombre

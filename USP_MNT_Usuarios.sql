@@ -1,5 +1,3 @@
-
-                                   
  CREATE PROCEDURE [dbo].[USP_MNT_Usuarios]          
             
 	@nOpcion INT = 0,   
@@ -65,44 +63,45 @@ BEGIN
 		END	
 
 		BEGIN
-
-      BEGIN TRAN
-			BEGIN TRY
-				BEGIN
-
-					INSERT INTO [TBL_USUARIO]
-				        (sNombres,sApellidos,nTipoDoc,sNumDoc,sSexo,nRol,sDireccion,nTelefono,dFechaNacimiento,bEstado)
-					VALUES(@sNombres,@sApellidos,@nTipoDoc,@sNumDoc,@sSexo,@nIdRol,@sDireccion,@nTelefono,@dFechaNacimiento,1)
-
-			  SET @nIdUsuario = SCOPE_IDENTITY()
-
-			  SET @sNombreUsuario = CONCAT(SUBSTRING(@sNombres,1,CHARINDEX(' ', @sNombres+' ',1)-1),'.',SUBSTRING(@sApellidos,1,CHARINDEX(' ', @sApellidos+' ',1)-1))
-
-			  SET @nContador = (SELECT COUNT(*) FROM [TBL_USUARIO] WHERE sNombres=LOWER(@sNombres) AND sApellidos=LOWER(@sApellidos))
-	
-			  IF(@nContador>0)
-			  BEGIN
-				SET @nContador = @nContador+1
-			      SET @sNombreUsuario = CONCAT(@sNombreUsuario,@nContador)
-			  END
-		
-    
-			  INSERT INTO [TBL_LOGIN]
-				      (nIdUsuario, sNombreUsuario, sContrasenia)
-			  VALUES(@nIdUsuario , LOWER(@sNombreUsuario),@sContrasenia)
-
-			  SELECT CONCAT('1|','El usuario se registró con éxito');
-
-				END
-				COMMIT TRAN
-			END TRY
-			BEGIN CATCH
-				ROLLBACK TRAN
-				PRINT ERROR_MESSAGE();					
-				SELECT concat('0|','Ha ocurrido un error al momento de registrar el usuario!');
-			END CATCH
-                
+			SET @sNombreUsuario = CONCAT(SUBSTRING(@sNombres,1,CHARINDEX(' ', @sNombres+' ',1)-1),'.',SUBSTRING(@sApellidos,1,CHARINDEX(' ', @sApellidos+' ',1)-1))
+			SET @nContador = (SELECT COUNT(*) FROM [TBL_USUARIO] WHERE sNombres=LOWER(@sNombres) AND sApellidos=LOWER(@sApellidos))
 		END
+
+		BEGIN
+
+			BEGIN TRAN
+				BEGIN TRY
+					BEGIN
+
+						INSERT INTO [TBL_USUARIO]
+					        (sNombres,sApellidos,nTipoDoc,sNumDoc,sSexo,nRol,sDireccion,nTelefono,dFechaNacimiento,bEstado)
+						VALUES(@sNombres,@sApellidos,@nTipoDoc,@sNumDoc,@sSexo,@nIdRol,@sDireccion,@nTelefono,@dFechaNacimiento,1)
+
+				  SET @nIdUsuario = SCOPE_IDENTITY()
+				  
+				  IF(@nContador>0)
+				  BEGIN
+					SET @nContador = @nContador+1
+				      SET @sNombreUsuario = CONCAT(@sNombreUsuario,@nContador)
+				  END
+			
+			
+				  INSERT INTO [TBL_LOGIN]
+					      (nIdUsuario, sNombreUsuario, sContrasenia)
+				  VALUES(@nIdUsuario , LOWER(@sNombreUsuario),@sContrasenia)
+
+				  SELECT CONCAT('1|','El usuario se registró con éxito');
+
+					END
+					COMMIT TRAN
+				END TRY
+				BEGIN CATCH
+					ROLLBACK TRAN
+					PRINT ERROR_MESSAGE();					
+					SELECT concat('0|','Ha ocurrido un error al momento de registrar el usuario!');
+				END CATCH
+			          
+			END
 		
 	END
 	   
